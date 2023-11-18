@@ -1,1 +1,1 @@
-# toss_ball
+Timetable design using Ebbinghaus' forgetting curve
