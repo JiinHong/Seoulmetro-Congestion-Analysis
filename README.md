@@ -4,9 +4,8 @@
 
 #### 시작하기
 
-분석을 실행하려면 다음 사전 요구 사항이 있는지 확인하세요:
+사전에 설치해야할 라이브러리 및 csv파일  
 
-- Python 3.x
 - NumPy
 - Matplotlib
 - `Seoulmetro_Congestion_by_station_and_time_zone.csv` (데이터 파일)
