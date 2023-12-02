@@ -105,10 +105,5 @@ else:
     plt.legend()
     plt.show()
 
-    # plt.xticks(x[:39], time_labels[:39], rotation=90)
-    # plt.xlabel('Time Slot')
-    # plt.ylabel('Average Congestion')
-    # plt.title(f'Subway Congestion by Subway Line and Time Slot - {user_input} Line')
-    # plt.legend()
-    # plt.grid(True)
-    # plt.show()
+
+
