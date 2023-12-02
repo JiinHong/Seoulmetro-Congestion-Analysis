@@ -31,8 +31,14 @@ time_labels = header[6:]  # Time slot labels
 x = np.arange(len(time_labels))
 # Extract and plot data for each subway line
 
-user_day = int(input("Choose today's day : 1.Weekday 2.Saturday 3.Holiday (Please input number)\n"))
 user_input = int(input("Select the line of the subway you want to take (lines 1 to 8).\n If you want to see congestion statistics for the entire subway, enter 0.\n"))
+user_day = int(input("Choose today's day : 1.Weekday 2.Saturday 3.Holiday (Please input number)\n"))
+if user_input != 0:
+    user_time_x, user_time_y = map(int, input("Enter the current time between 5:30 today and 00:30 the next day. (ex. 17:30) \n").split(":"))
+    convert_to_input = user_time_x*2 + user_time_y/60 - 10.5
+
+    if convert_to_input < 0:
+        convert_to_input += 48
 
 if user_input == 0:
     plt.figure(figsize=(12, 6))
@@ -77,7 +83,7 @@ else:
     x = np.array(x)
     y = np.array(y)
     # 다항 회귀 모델 생성
-    degree = 10  # 다항식의 차수 설정
+    degree = 9  # 다항식의 차수 설정
     poly_features = PolynomialFeatures(degree=degree)
     X_poly = poly_features.fit_transform(x.reshape(-1, 1))
 
@@ -85,15 +91,26 @@ else:
     poly_reg = LinearRegression()
     poly_reg.fit(X_poly, y)
 
-    new_X = np.array([[25]])
+    new_X = np.array([[convert_to_input]])
     new_X_poly = poly_features.transform(new_X)
     predicted_y = poly_reg.predict(new_X_poly)
-    print(f"X={new_X[0, 0]}일 때, 예측된 y 값: {predicted_y[0]}")
 
     # 결과 시각화
     X_range = np.linspace(min(x), max(x), 100).reshape(-1, 1)
     X_range_poly = poly_features.transform(X_range)
     predicted_y_range = poly_reg.predict(X_range_poly)
+
+    if predicted_y[0] >= 36:
+        congestion_expect = ('매우 혼잡')
+    elif predicted_y[0] >= 30:
+        congestion_expect = ('혼잡')
+    elif predicted_y[0] >= 25:
+        congestion_expect = ('보통')
+    elif predicted_y[0] >= 15:
+        congestion_expect = ('쾌적')
+    elif predicted_y[0] < 15:
+        congestion_expect = ('매우 쾌적')
+    print(f"Current expected congestion : {congestion_expect}")
 
     plt.scatter(x, y, label='raw data', s = 1)
     plt.plot(X_range, predicted_y_range, label='Polynomial Regression', color='black')
