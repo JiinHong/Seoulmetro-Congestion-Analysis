@@ -2,6 +2,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import warnings
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 warnings.filterwarnings("ignore", category=RuntimeWarning, message="Mean of empty slice")
 np.seterr(divide='ignore', invalid='ignore')
@@ -59,16 +61,54 @@ else:
         mask = (np.array(lines) == str(user_input)) & (np.array(DayOfWeek) == "Saturday")
     elif user_day == 3:
         mask = (np.array(lines) == str(user_input)) & (np.array(DayOfWeek) == "holiday")
-    arr = times[mask][:, :len(time_labels)]
-    for idx, e in enumerate(arr):
-        ret = list(map(float, e))
-        print(idx, " : ", ret)
     congestion = np.mean(times[mask][:, :len(time_labels)], axis=0)
-    plt.plot(x[:len(congestion)], congestion)
+    arr = times[mask][:, :len(time_labels)]
+
+    for e in arr:
+        plt.plot(x[:len(e)], e, '.', color='red')
+    plt.plot(x[:len(congestion)], congestion, label='median')
+    y = [y for x in arr for y in x]
+    x = []
+    while len(x) != len(y):
+        for j in range(39):
+            x.append(j)
+
+    mid = sum(y)/len(y)
+    x = np.array(x)
+    y = np.array(y)
+    # 다항 회귀 모델 생성
+    degree = 10  # 다항식의 차수 설정
+    poly_features = PolynomialFeatures(degree=degree)
+    X_poly = poly_features.fit_transform(x.reshape(-1, 1))
+
+    # 선형 회귀 모델 생성 및 훈련
+    poly_reg = LinearRegression()
+    poly_reg.fit(X_poly, y)
+
+    new_X = np.array([[25]])
+    new_X_poly = poly_features.transform(new_X)
+    predicted_y = poly_reg.predict(new_X_poly)
+    print(f"X={new_X[0, 0]}일 때, 예측된 y 값: {predicted_y[0]}")
+
+    # 결과 시각화
+    X_range = np.linspace(min(x), max(x), 100).reshape(-1, 1)
+    X_range_poly = poly_features.transform(X_range)
+    predicted_y_range = poly_reg.predict(X_range_poly)
+
+    plt.scatter(x, y, label='raw data', s = 1)
+    plt.plot(X_range, predicted_y_range, label='Polynomial Regression', color='black')
+    plt.axhline(y=mid, color='green', linestyle='--', label='Total median line')
     plt.xticks(x[:39], time_labels[:39], rotation=90)
     plt.xlabel('Time Slot')
-    plt.ylabel('Average Congestion')
+    plt.ylabel('Congestion')
     plt.title(f'Subway Congestion by Subway Line and Time Slot - {user_input} Line')
     plt.legend()
-    plt.grid(True)
     plt.show()
+
+    # plt.xticks(x[:39], time_labels[:39], rotation=90)
+    # plt.xlabel('Time Slot')
+    # plt.ylabel('Average Congestion')
+    # plt.title(f'Subway Congestion by Subway Line and Time Slot - {user_input} Line')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
