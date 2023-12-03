@@ -4,6 +4,7 @@
 
 ### 📌 사전에 설치해야할 라이브러리 및 csv파일
 
+- python 3.9(권장)
 - csv
 - NumPy
 - Matplotlib
