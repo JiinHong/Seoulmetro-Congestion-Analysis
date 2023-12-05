@@ -9,6 +9,7 @@ import warnings
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
+
 warnings.filterwarnings("ignore", category=RuntimeWarning, message="Mean of empty slice")
 np.seterr(divide='ignore', invalid='ignore')
 
